@@ -5,7 +5,7 @@ This is AI Chat APP bootstraped with `LM Studio API`, `Next.js` and `Shadcn UI`.
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) (v18+ recommended)
-- `LM Studio` running locally with accessible API endpoints.
+- [LM Studio](https://lmstudio.ai/) running locally with accessible API endpoints.
 - Environment variable file (.env) with:
   ```env
   NEXT_PUBLIC_LM_STUDIO_URL=http://192.168.100.7:1234
