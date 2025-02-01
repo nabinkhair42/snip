@@ -1,6 +1,8 @@
+<img src="./src/app/icon.svg" width="80px" height="80px">
 
-# AI Chat App
-This is AI Chat APP bootstraped with `LM Studio API`, `Next.js` and `Shadcn UI`.
+# Snip - AI Chat App
+This is AI Chat APP bootstraped with `LM Studio API` and `Next.js`.
+
 
 ## Prerequisites
 
@@ -48,12 +50,6 @@ yarn dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Features
-
-- Chat UI with markdown support.
-- Streaming responses from a local LM Studio endpoint.
-- Theme toggle and clear conversation functionality.
-- Displays current AI model information from LM Studio.
 
 ## Project Structure
 
@@ -78,3 +74,8 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 - Modify the LM Studio API URL by updating the environment variable in your `.env` file.
 - Customize UI components under **src/components/** as needed.
 
+
+# Future Work
+- [ ] `Ollama` API integration for more conversational chat.
+- [ ] `Code Snippet` for code generation
+- [ ] `AI Model` Switching Feature
