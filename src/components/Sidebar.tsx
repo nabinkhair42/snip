@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { MessageSquare, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Message } from './ChatWindow'
 
 export interface Chat {
   id: string
   title: string
+  messages: Message[]
 }
 
 export interface SidebarProps {

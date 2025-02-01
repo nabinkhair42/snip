@@ -1,70 +1,26 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { ChatWindow, type Message } from "../components/ChatWindow"
+import { useState } from "react"
+import { ChatWindow } from "../components/ChatWindow"
 import { ChatInput } from "../components/ChatInput"
 import { ChatHeader } from "../components/ChatHeader"
-import { v4 as uuidv4 } from "uuid"
-import { Sidebar, type Chat } from "../components/Sidebar"
-import { X } from "lucide-react"
+import { Sidebar } from "../components/Sidebar"
 import { cn } from "../lib/utils"
-import { Button } from "@/components/ui/button"
+import { useChat } from "../hooks/useChat"
 
 export default function Home() {
-  const [mounted, setMounted] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([])
-  const [loading, setLoading] = useState(false)
-  const [chats, setChats] = useState<Chat[]>([{ id: "default", title: "New Chat" }])
-  const [selectedChat, setSelectedChat] = useState<Chat>(chats[0])
+  const {
+    mounted,
+    messages,
+    loading,
+    chats,
+    selectedChat,
+    sendMessage,
+    handleNewChat,
+    handleSelectChat,
+    clearConversation
+  } = useChat()
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  const sendMessage = async (text: string) => {
-    const userMessage: Message = { id: uuidv4(), text, isUser: true }
-    setMessages((prev) => [...prev, userMessage])
-    setLoading(true)
-
-    try {
-      const contextString = [...messages, userMessage]
-        .map((m) => (m.isUser ? "User: " : "Assistant: ") + m.text)
-        .join("\n")
-
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: contextString }),
-      })
-
-      if (!response.ok) throw new Error("API error")
-      const data = await response.json()
-      const replyText = data.reply ?? data.choices?.[0]?.message?.content ?? "No reply from API."
-      setMessages((prev) => [...prev, { id: uuidv4(), text: replyText, isUser: false }])
-    } catch (error) {
-      setMessages((prev) => [...prev, { id: uuidv4(), text: "Error contacting the API.", isUser: false }])
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleNewChat = () => {
-    const newChat = { id: uuidv4(), title: "New Chat" }
-    setChats((prev) => [newChat, ...prev])
-    setSelectedChat(newChat)
-    setMessages([])
-  }
-
-  const handleSelectChat = (chat: Chat) => {
-    setSelectedChat(chat)
-    setMessages([])
-    setSidebarOpen(false)
-  }
-
-  const clearConversation = () => {
-    setMessages([])
-  }
 
   if (!mounted) return null
 
@@ -95,7 +51,6 @@ export default function Home() {
           )}
           onClick={(e) => e.stopPropagation()}
         >
-          
           <Sidebar
             chats={chats}
             onSelectChat={handleSelectChat}

@@ -16,16 +16,14 @@ export interface ChatWindowProps {
 }
 
 export const ChatWindow: React.FC<ChatWindowProps> = ({ messages, loading }) => {
-  const scrollAreaRef = useRef<HTMLDivElement>(null)
+  const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
-    }
-  }, [scrollAreaRef])
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
 
   return (
-    <ScrollArea className="h-full" ref={scrollAreaRef}>
+    <ScrollArea className="h-full">
       <div className="max-w-3xl mx-auto py-4 space-y-6 px-4">
         {messages.length === 0 && (
           <div className="text-center text-muted-foreground py-8">Start a conversation by typing a message below.</div>
@@ -38,6 +36,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ messages, loading }) => 
             <Loader className="w-6 h-6 animate-spin text-primary" />
           </div>
         )}
+        <div ref={bottomRef} />
       </div>
     </ScrollArea>
   )
