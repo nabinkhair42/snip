@@ -59,19 +59,19 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 - **src/app/**  
   Contains Next.js pages and API routes.
-  - **api/chat/route.ts**  
+  - `api/chat/route.ts`  
     API route that sends chat requests to LM Studio and returns a streamed response.
-  - **page.tsx**  
+  - `page.tsx`  
     Main entry point for the UI chat application.
 
 - **src/components/**  
   Contains UI components:
-  - **ChatHeader.tsx** – Header showing the app title, model information, theme toggle, and clear conversation.
-  - **ChatWindow.tsx** – Displays the chat messages.
-  - **ChatInput.tsx** – Input field for sending messages.
-  - **ChatMessage.tsx** – Displays individual chat messages with markdown formatting.
-  - **extended/** – Components for extended functionality (e.g., ThemeToggle, ClearConversation).
-  - **ui/** – Basic UI components like Button, Input, Badge.
+  - `ChatHeader.tsx` – Header showing the app title, model information, theme toggle, and clear conversation.
+  - `ChatWindow.tsx` – Displays the chat messages.
+  - `ChatInput.tsx` – Input field for sending messages.
+  - `ChatMessage.tsx` – Displays individual chat messages with markdown formatting.
+  - `extended/` – Components for extended functionality (e.g., ThemeToggle, ClearConversation).
+  - `ui/` – Basic UI components like Button, Input, Badge.
 
 ## Customization
 
