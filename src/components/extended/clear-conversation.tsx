@@ -10,7 +10,7 @@ const ClearConversation = ({ clearConversation }: ClearConversationProps) => {
   return (
     <div>
         <Button onClick={clearConversation} size="icon" variant="outline">
-            <Trash />
+            <Trash className="h-4 w-4" />
             </Button>
     </div>
   )

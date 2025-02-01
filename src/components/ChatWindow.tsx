@@ -1,26 +1,45 @@
-import React from "react";
-import { ChatMessage } from "./ChatMessage";
+import type React from "react"
+import { useEffect, useRef } from "react"
+import { ChatMessage } from "./ChatMessage"
+import { Loader } from "lucide-react"
+import { ScrollArea } from "./ui/scroll-area"
 
 export interface Message {
-  id: string;
-  text: string;
-  isUser: boolean;
+  id: string
+  text: string
+  isUser: boolean
 }
 
 export interface ChatWindowProps {
-  messages: Message[];
-  loading?: boolean;
+  messages: Message[]
+  loading?: boolean
 }
 
 export const ChatWindow: React.FC<ChatWindowProps> = ({ messages, loading }) => {
+  const scrollAreaRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
+    }
+  }, [scrollAreaRef])
+
   return (
-    <div className="flex flex-col gap-4 overflow-y-auto p-4 h-full">
-      {messages.map((msg) => (
-        <ChatMessage key={msg.id} message={msg.text} isUser={msg.isUser} />
-      ))}
-      {loading && (
-        <div className="p-4 text-sm text-center text-muted animate-pulse">Thinking...</div>
-      )}
-    </div>
-  );
-}; 
+    <ScrollArea className="h-full" ref={scrollAreaRef}>
+      <div className="max-w-3xl mx-auto py-4 space-y-6 px-4">
+        {messages.length === 0 && (
+          <div className="text-center text-muted-foreground py-8">Start a conversation by typing a message below.</div>
+        )}
+        {messages.map((msg) => (
+          <ChatMessage key={msg.id} message={msg.text} isUser={msg.isUser} />
+        ))}
+        {loading && (
+          <div className="flex justify-center py-4">
+            <Loader className="w-6 h-6 animate-spin text-primary" />
+          </div>
+        )}
+      </div>
+    </ScrollArea>
+  )
+}
+

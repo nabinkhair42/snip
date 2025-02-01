@@ -1,73 +1,120 @@
-"use client";
+"use client"
 
-import React, { useState, useEffect } from "react";
-import { ChatWindow, Message } from "../components/ChatWindow";
-import { ChatInput } from "../components/ChatInput";
-import { ChatHeader } from "../components/ChatHeader";
-import { v4 as uuidv4 } from "uuid";
+import { useState, useEffect } from "react"
+import { ChatWindow, type Message } from "../components/ChatWindow"
+import { ChatInput } from "../components/ChatInput"
+import { ChatHeader } from "../components/ChatHeader"
+import { v4 as uuidv4 } from "uuid"
+import { Sidebar, type Chat } from "../components/Sidebar"
+import { X } from "lucide-react"
+import { cn } from "../lib/utils"
+import { Button } from "@/components/ui/button"
 
 export default function Home() {
-  const [mounted, setMounted] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(false);
-  
+  const [mounted, setMounted] = useState(false)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [loading, setLoading] = useState(false)
+  const [chats, setChats] = useState<Chat[]>([{ id: "default", title: "New Chat" }])
+  const [selectedChat, setSelectedChat] = useState<Chat>(chats[0])
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false)
+
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    setMounted(true)
+  }, [])
 
   const sendMessage = async (text: string) => {
-    const userMessage: Message = { id: uuidv4(), text, isUser: true };
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
-    setLoading(true);
+    const userMessage: Message = { id: uuidv4(), text, isUser: true }
+    setMessages((prev) => [...prev, userMessage])
+    setLoading(true)
 
     try {
-      const contextString = updatedMessages
-        .map((m) => (m.isUser ? "User: " : "Bot: ") + m.text)
-        .join("\n");
+      const contextString = [...messages, userMessage]
+        .map((m) => (m.isUser ? "User: " : "Assistant: ") + m.text)
+        .join("\n")
 
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: contextString })
-      });
-      if (!response.body) throw new Error("ReadableStream not supported.");
+        body: JSON.stringify({ message: contextString }),
+      })
 
-      const reader = response.body!.getReader();
-      const decoder = new TextDecoder("utf-8");
-      let resultText = "";
-      let done = false;
-      while (!done) {
-        const { value, done: doneReading } = await reader.read();
-        done = doneReading;
-        resultText += decoder.decode(value || new Uint8Array(), { stream: !done });
-      }
-
-      const parsedResponse = JSON.parse(resultText);
-      const replyText =
-        parsedResponse.reply ??
-        parsedResponse.choices?.[0]?.message?.content ??
-        "No reply from API.";
-      setMessages((prev) => [...prev, { id: uuidv4(), text: replyText, isUser: false }]);
+      if (!response.ok) throw new Error("API error")
+      const data = await response.json()
+      const replyText = data.reply ?? data.choices?.[0]?.message?.content ?? "No reply from API."
+      setMessages((prev) => [...prev, { id: uuidv4(), text: replyText, isUser: false }])
     } catch (error) {
-      setMessages((prev) => [...prev, { id: uuidv4(), text: "Error contacting the API.", isUser: false }]);
+      setMessages((prev) => [...prev, { id: uuidv4(), text: "Error contacting the API.", isUser: false }])
+    } finally {
+      setLoading(false)
     }
-    setLoading(false);
-  };
+  }
 
-  const clearConversation = () => setMessages([]);
+  const handleNewChat = () => {
+    const newChat = { id: uuidv4(), title: "New Chat" }
+    setChats((prev) => [newChat, ...prev])
+    setSelectedChat(newChat)
+    setMessages([])
+  }
 
-  if (!mounted) return null;
+  const handleSelectChat = (chat: Chat) => {
+    setSelectedChat(chat)
+    setMessages([])
+    setSidebarOpen(false)
+  }
+
+  const clearConversation = () => {
+    setMessages([])
+  }
+
+  if (!mounted) return null
+
   return (
-    <div className="flex flex-col h-screen">
-      <ChatHeader clearConversation={clearConversation} />
-      
-      <main className="flex-grow overflow-y-auto max-w-4xl mx-auto border-l border-r w-full p-4">
-        <ChatWindow messages={messages} loading={loading} />
-      </main>
-      <footer className="border-t">
-        <ChatInput onSend={sendMessage} />
-      </footer>
+    <div className="flex h-screen bg-background">
+      {/* Desktop Sidebar */}
+      <div className="hidden md:block border-r">
+        <Sidebar
+          chats={chats}
+          onSelectChat={handleSelectChat}
+          onNewChat={handleNewChat}
+          selectedChatId={selectedChat?.id}
+        />
+      </div>
+
+      {/* Mobile Sidebar */}
+      <div
+        className={cn(
+          "fixed inset-0 z-50 bg-background/80 backdrop-blur-sm transition-opacity md:hidden",
+          sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none",
+        )}
+        onClick={() => setSidebarOpen(false)}
+      >
+        <div
+          className={cn(
+            "fixed inset-y-0 left-0 z-50 w-64 bg-background border-r transition-transform duration-300",
+            sidebarOpen ? "translate-x-0" : "-translate-x-full",
+          )}
+          onClick={(e) => e.stopPropagation()}
+        >
+          
+          <Sidebar
+            chats={chats}
+            onSelectChat={handleSelectChat}
+            onNewChat={handleNewChat}
+            selectedChatId={selectedChat?.id}
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-col flex-1">
+        <ChatHeader toggleSidebar={() => setSidebarOpen(true)} clearConversation={clearConversation} />
+        <main className="flex-1 overflow-hidden">
+          <ChatWindow messages={messages} loading={loading} />
+        </main>
+        <footer className="border-t bg-background">
+          <ChatInput onSend={sendMessage} />
+        </footer>
+      </div>
     </div>
-  );
+  )
 }
+
