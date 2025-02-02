@@ -1,6 +1,6 @@
 <img src="./src/app/icon.svg" width="80px" height="80px">
 
-# Snip UI - AI Chat App
+# Snip UI - Web Interface
 This is AI Chat APP bootstraped with `LM Studio API` and `Next.js`.
 
 
